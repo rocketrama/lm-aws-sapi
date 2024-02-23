@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<sub-flow name="impl-delete-productSub_Flow" doc:id="fd826029-0212-45d7-866b-2de401f431dd" >
+		<logger level="INFO" doc:name="Flow Start Logger" doc:id="f09dff1d-528d-4907-8476-8144169680a0" message="The #[flow.name] is started with correlationId is #[correlationId]." />
+		<db:delete doc:name="Delete Product" doc:id="4ebec838-b795-49b6-b542-a09d32e6a2e9" config-ref="Database_Config">
+			<db:sql><![CDATA[delete from Rproduct where productId = 3;]]></db:sql>
+		</db:delete>
+		<logger level="INFO" doc:name="Flow End Logger" doc:id="95cbdf84-abae-4b80-90bf-76c393297086" message="The #[flow.name] is End with correlationId is #[correlationId]." />
+	</sub-flow>
+</mule>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+		<sub-flow name="impl-post-productsSub_Flow" doc:id="5f4a04b7-18a9-4d06-ae64-6137efcbdb37" >
+		<logger level="INFO" doc:name="Flow Start Logger" doc:id="f6b5b76a-fed2-420f-87bb-0ba89e641a5c" message="The #[flow.name] is started with correlationId is #[correlationId]." />
+		<db:insert doc:name="Insert Product" doc:id="1303ef5d-0c1c-4c46-b3d1-2848dfd62689" config-ref="Database_Config">
+			<db:sql><![CDATA[INSERT INTO Rproduct values(:productId, :productName, :productImage, :productMake, :productModel, :productPrice, :productFeature);]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+  "productId": payload.productId,
+  "productName": payload.productName,
+  "productImage": payload.productImage,
+  "productMake": payload.productMake,
+  "productModel": payload.productModel,
+  "productPrice": payload.productPrice,
+  "productFeature": payload.productFeature
+  }]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Response payload">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  code: "SUCCESS",
+  message: "Product created successfully",
+  details: {
+    id: payload.productId
+  }
+} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<logger level="INFO" doc:name="Flow End Logger" doc:id="d80e7fc3-2a73-4c9b-8152-e6818809080b" message="The #[flow.name] is End with correlationId is #[correlationId] and Payload is : #[payload]." />
+	</sub-flow>
+</mule>

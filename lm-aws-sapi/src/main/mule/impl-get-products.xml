@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<!-- [STUDIO:"impl-get-productsSub_Flow"]<sub-flow name="impl-get-productsSub_Flow" doc:id="a2187dc0-ea2a-4ca8-935e-4860f27c5c9e" >
+		<logger level="INFO" doc:name="Flow End Logger" doc:id="83855ae0-620b-4523-b094-13bdfcc3b8f1" message="The #[flow.name&#93; is started with correlationId is #[correlationId&#93;." />
+		<ee:transform doc:name="Transform Message" doc:id="cf32ecc2-9080-46ba-b431-3d868f915aee" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="productId" ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+attributes.queryParams.productId&#93;&#93;></ee:set-variable>
+				<ee:set-variable variableName="offset" ><![CDATA[%dw 2.0
+output application/java
+&#45;&#45;-
+message.attributes.queryParams.offset&#93;&#93;></ee:set-variable>
+				<ee:set-variable variableName="limit" ><![CDATA[%dw 2.0
+output application/java
+&#45;&#45;-
+message.attributes.queryParams.limit&#93;&#93;></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<db:select doc:name="Get Products" doc:id="fba9d77d-3cf1-47cd-aeb0-43b51e70a2d6" config-ref="Database_Config">
+			<db:sql><![CDATA[select * from Rproduct 
+limit 100 OFFSET 0 &#93;&#93;></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"limit": vars.limit,
+	"offset": vars.offset
+}&#93;&#93;&#93;></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+payload map(item)->{
+  productId: item.productId,
+  productName: item.productName,
+  productImage: item.productImage,
+  productMake: item.productMake,
+  productPrice: item.productPrice,
+  productFeature: item.productFeature
+  } &#93;&#93;></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<logger level="INFO" doc:name="FLow End Logger" doc:id="6515da5c-7484-4b66-abad-fbc37a4c191e" message="The #[flow.name&#93; is End with correlationId is #[correlationId&#93; and Payload is : #[payload&#93;." />
+	</sub-flow> [STUDIO] -->
+	<sub-flow name="impl-get-productsSub_Flow1" doc:id="0f95d6f9-bebf-4ff4-9cac-f95d13948b1a" >
+	<logger level="INFO" doc:name="Flow End Logger" doc:id="f01ad47d-1459-4857-a793-027de94c9ec3" message="The #[flow.name] is started with correlationId is #[correlationId]." />
+		<ee:transform doc:name="Set Variables" doc:id="e9534cb8-5635-4d8f-af5f-f7eaadf50e4d" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="productId" ><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.productId]]></ee:set-variable>
+				<ee:set-variable variableName="offset" ><![CDATA[%dw 2.0
+output application/java
+---
+message.attributes.queryParams.offset as Number]]></ee:set-variable>
+				<ee:set-variable variableName="limit" ><![CDATA[%dw 2.0
+output application/java
+var requestLimit = message.attributes.queryParams.limit as Number
+var internalLimit = p("limit.limit") as Number 
+---
+if (requestLimit > internalLimit)
+	internalLimit
+else 
+	requestLimit]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Log Message" doc:id="29ea08c6-4baf-4e28-a286-898e4d2ed7a9" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="logMessage" ><![CDATA[%dw 2.0
+output application/java
+var offset = vars.offset as String
+var limit = vars.limit as String
+---
+{
+	message: "Get product in database",
+	content: {
+		info: "Querying aws DB with offset: $(offset), limit: $(limit)."
+	}
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger FLow" doc:id="993a9d1b-b8d9-4658-b661-41ca21dd4474" message="#[vars.logMessage]"/>
+		<db:select doc:name="Call Get Products from Database" doc:id="c7bbc1c7-ead0-49f7-b093-c6a272a2d1ea" config-ref="Database_Config">
+			<db:sql><![CDATA[select * 
+from Rproduct 
+LIMIT :limit OFFSET :offset;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	limit: vars.limit,
+	offset: vars.offset
+}]]]></db:input-parameters>
+		
+</db:select>
+		<ee:transform doc:name="Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map(item)->{
+  productId: item.productId,
+  productName: item.productName,
+  productImage: item.productImage,
+  productMake: item.productMake,
+  productPrice: item.productPrice,
+  productFeature: item.productFeature
+  } ]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<ee:transform doc:name="LogMessage" doc:id="3e92f604-8563-4904-b711-7ca0a31aa167" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="logMessage" ><![CDATA[%dw 2.0
+output application/java
+var records = 
+	if (message.payload != null)
+		sizeOf(payload) as String
+	else 
+		"0"
+---
+{
+	message: "Get products from aws database",
+	content: {
+		info: "$(records) records fetched from Aws DB."
+	}
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="FLow End Logger" doc:id="f617d71a-cc72-461f-ac3d-447d9ac630bf" message="The #[flow.name] is End with correlationId is #[correlationId] and Payload is : #[vars.logMessage]." />
+	</sub-flow>
+</mule>

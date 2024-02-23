@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="impl-patch-productSub_Flow" doc:id="d1b658c2-3e69-4a14-93cb-ffff751eac3a" >
+		<logger level="INFO" doc:name="Floe Start Logger" doc:id="d2b5a9a7-3e4b-40d6-aaba-725347796998" message="The #[flow.name] is started with correlationId is #[correlationId]." />
+		<db:update doc:name="Update the product" doc:id="9fb795f9-727b-47d6-90ce-76147c0559ea" config-ref="Database_Config">
+			<db:sql><![CDATA[update Rproduct set productName="apple" where productId = 2;]]></db:sql>
+		</db:update>
+		<ee:transform doc:name="Response" doc:id="4e000dbb-539c-4630-aa4a-da771755017c">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  code: "SUCCESS",
+  message: "Product updated successfully",
+  details: {
+    id: payload.productId
+  }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Flow End Logger" doc:id="5551065d-96aa-4584-a4f5-aa5977395ba6" message="The #[flow.name] is End with correlationId is #[correlationId] and Payload is : #[payload]." />
+	</sub-flow>
+</mule>

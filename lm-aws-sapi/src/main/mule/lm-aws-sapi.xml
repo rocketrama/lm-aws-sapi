@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <flow name="lm-aws-sapi-main" doc:id="e40b8701-fbfc-449d-ac90-42cfd0d96469">
+        <http:listener path="/api/*" config-ref="lm-aws-sapi-httpListenerConfig">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="lm-aws-sapi-config" />
+        <error-handler ref="lm-errorhandlingError_Handler" />
+    </flow>
+    <flow name="lm-aws-sapi-console" doc:id="728e0a45-81c8-46d5-840c-6bd69e9ab3af">
+        <http:listener path="/console/*" config-ref="lm-aws-sapi-httpListenerConfig">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="lm-aws-sapi-config" />
+        <error-handler ref="lm-errorhandlingError_Handler" />
+    </flow>
+    <flow name="delete:\products\(id):lm-aws-sapi-config">
+        <flow-ref doc:name="Flow Reference" doc:id="d0d0783c-bed9-4a06-9a75-52dbe5fa3e13" name="impl-delete-productSub_Flow" />
+        <error-handler ref="lm-errorhandlingError_Handler" />
+    </flow>
+    <flow name="patch:\products\(id):application\json:lm-aws-sapi-config">
+        <flow-ref doc:name="Flow Reference" doc:id="1224ba24-896e-4b60-8083-56d88b18498c" name="impl-patch-productSub_Flow" />
+        <error-handler ref="lm-errorhandlingError_Handler" />
+    </flow>
+    <flow name="get:\products\(id):lm-aws-sapi-config">
+		<flow-ref doc:name="Flow Reference" doc:id="697354e1-9d0c-4f68-a739-715a10325056" name="impl-get-productsSub_Flow1" />
+        <error-handler ref="lm-errorhandlingError_Handler" />
+    </flow>
+    <flow name="post:\product:application\json:lm-aws-sapi-config">
+        <flow-ref doc:name="Flow Reference" doc:id="14a7ade2-c1f0-4fca-b7dd-98208f4f61bb" name="impl-post-productsSub_Flow" />
+        <error-handler ref="lm-errorhandlingError_Handler" />
+    </flow>
+</mule>

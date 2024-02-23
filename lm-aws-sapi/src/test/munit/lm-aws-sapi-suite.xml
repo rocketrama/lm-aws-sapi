@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="lm-aws-sapi-suite.xml" />
+	<munit:test name="lm-aws-sapi-main-test" doc:id="ac2d5d11-c460-45c5-af09-6632c8cc7cdb" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="12e126a1-c444-41b8-b7ea-b24ef85e1e69" processor="http:listener">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="/api/*" attributeName="path" />
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-httpListenerConfig" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="73baf52d-612e-4d0a-8017-966d898685f8" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="135038f3-8e83-4654-b168-d6a668d2ce3f" >
+				<munit:payload value="#[readUrl('classpath://lmawssapimaintest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://lmawssapimaintest\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to lm-aws-sapi-main" doc:id="d8366ed3-3c77-44c5-8859-fadffa9be5bb" name="lm-aws-sapi-main"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="f22ab321-a975-40f2-b019-ba354cff3bd3" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import lmawssapimaintest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="lm-aws-sapi-console-test" doc:id="1b8eb976-4a3e-41b1-adf8-2cb3e5fdaefe" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="6284d6b7-32dc-4474-b05c-6b10810267bc" processor="http:listener">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="/console/*" attributeName="path" />
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-httpListenerConfig" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="ec978ad4-af1f-4504-b128-d4632f3570f5" processor="apikit:console">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="00716292-6876-4b9e-8089-ed585d80cc99" >
+				<munit:payload value="#[readUrl('classpath://lmawssapiconsoletest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://lmawssapiconsoletest\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to lm-aws-sapi-console" doc:id="967b25da-cb07-49f1-975b-26c2dd0e7c24" name="lm-aws-sapi-console"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="895dc7cc-57b1-482d-bbdf-db9bee6c8964" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import lmawssapiconsoletest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="delete:\products\(id):lm-aws-sapi-config-test" doc:id="1b72e2cb-eca7-40c3-9e38-577578c91267" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="aa02e6f0-fb68-468a-83bf-ad5ffdf286e0" >
+				<munit:payload value="#[readUrl('classpath://deleteproductsidlmawssapiconfigtest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://deleteproductsidlmawssapiconfigtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://deleteproductsidlmawssapiconfigtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to delete:\products\(id):lm-aws-sapi-config" doc:id="7718254d-8903-4e32-87c7-ebb4ab3b7ea2" name="delete:\products\(id):lm-aws-sapi-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="cbb36aec-3bf6-48c2-a2ea-a454d3d14994" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import deleteproductsidlmawssapiconfigtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="patch:\products\(id):application\json:lm-aws-sapi-config-test" doc:id="75ad93c3-fcf7-4383-932c-f939c5aee551" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="c710c676-f98a-4abb-96a6-cdf73fb9b296" >
+				<munit:payload value="#[output application/json  --- readUrl('classpath://patchproductsidapplicationjsonlmawssapiconfigtest\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json " />
+				<munit:attributes value="#[readUrl('classpath://patchproductsidapplicationjsonlmawssapiconfigtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://patchproductsidapplicationjsonlmawssapiconfigtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to patch:\products\(id):application\json:lm-aws-sapi-config" doc:id="ab4cf507-a68f-4dec-b9c0-02661e63e25c" name="patch:\products\(id):application\json:lm-aws-sapi-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="57e9a033-5827-4e77-a3cb-3f7c7a160a50" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import patchproductsidapplicationjsonlmawssapiconfigtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+		<munit:test name="lm-aws-sapi-test-suite-lm-aws-sapi-mainTest-error" doc:id="20cd9491-3157-47f6-8a99-bd0de60eaf12" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="dc101517-53a8-4524-afeb-a2d4902241c2" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="d29c4719-7fa2-4857-bbdf-f40f1dc71a4c" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Flow Reference" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="697354e1-9d0c-4f68-a739-715a10325056" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="impl-get-productsSub_Flow" attributeName="name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="f0c241aa-878e-482a-9259-db4367c4e4e0" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Flow Reference" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="14a7ade2-c1f0-4fca-b7dd-98208f4f61bb" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="impl-post-productsSub_Flow" attributeName="name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="721d628d-0f97-481a-a889-65ccbde5749d" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Flow Reference" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="1224ba24-896e-4b60-8083-56d88b18498c" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="impl-patch-productSub_Flow" attributeName="name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="5305804a-947d-4001-9ce4-04b5c3d04219" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Flow Reference" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="d0d0783c-bed9-4a06-9a75-52dbe5fa3e13" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="impl-delete-productSub_Flow" attributeName="name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<try doc:name="Try" doc:id="617e8845-783d-4128-bd95-62561e5bc7c0" >
+				<flow-ref doc:name="Flow-ref to lm-aws-sapi-main" doc:id="5d69483f-9139-49e4-ae87-b130d9a58935" name="lm-aws-sapi-console" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="174bf1e4-ff52-4181-a211-87524357e615" type="ANY"/>
+				</error-handler>
+			</try>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="lm-aws-sapi-suiteTesr-400" doc:id="88076ed2-c6a4-4f18-a38a-81b7e7ef30d5" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="2bbbd085-5c4d-462c-90f4-95c61b3c7336" processor="http:listener">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="/api/*" attributeName="path" />
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-httpListenerConfig" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:BAD_REQUEST" />
+				</munit-tools:then-return>
+
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="f4041294-f4cc-4f8d-a75d-bad9cf78f5cc" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:BAD_REQUEST" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<try doc:name="Try" doc:id="999b80c3-801b-4005-8827-ef51eb7f2b8c" >
+				<flow-ref doc:name="Flow-ref to lm-aws-sapi-main" doc:id="e8d520db-680b-405d-8d43-d5648980a14e" name="lm-aws-sapi-main" />
+				<error-handler>
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="2eecec06-7f9f-469b-9bfd-efdfa1a5c331" type="APIKIT:BAD_REQUEST"/>
+				</error-handler>
+			</try>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="lm-aws-sapi-suiteTesr-404" doc:id="aa419c6d-e986-465c-9654-8a2efe706426" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="bb06c9cc-061f-407f-80fd-b74cc14d9d7a" processor="http:listener">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="/api/*" attributeName="path" />
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-httpListenerConfig" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_FOUND" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="4c890d7c-0b6b-4bab-b412-af5a0d3b4a90" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_FOUND" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<try doc:name="Try" doc:id="7d328181-321d-4962-aa22-b7ac86184d1e" >
+				<flow-ref doc:name="Flow-ref to lm-aws-sapi-main" doc:id="86595870-322d-467a-8269-ba350ffc78b1" name="lm-aws-sapi-main" />
+				<error-handler>
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="db358fc6-8341-4195-9c6e-e940037da615" type="APIKIT:NOT_FOUND"/>
+				</error-handler>
+			</try>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="lm-aws-sapi-suiteTesr-405" doc:id="7d2d5324-3555-4c5c-90d3-18bbd27ac043" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="be8efff7-d1ae-4d98-96a4-d2b47be29415" processor="http:listener">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="/api/*" attributeName="path" />
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-httpListenerConfig" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:METHOD_NOT_ALLOWED" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="07f522ba-0f7e-41de-8931-b8a6e4bd388f" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:METHOD_NOT_ALLOWED" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<try doc:name="Try" doc:id="77de1a50-627c-4203-803f-38a299999164" >
+				<flow-ref doc:name="Flow-ref to lm-aws-sapi-main" doc:id="2749c8eb-d53c-4636-b91f-980ffa140f8e" name="lm-aws-sapi-main" />
+				<error-handler>
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="27f353fd-5395-4c55-aa62-86610fe746c4" type="APIKIT:METHOD_NOT_ALLOWED"/>
+				</error-handler>
+			</try>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="lm-aws-sapi-suiteTesr-406" doc:id="e6fadb50-5306-485a-9d3b-bd8fe688eda8" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="4c98aca7-f4e0-49a1-9ce0-ed1a8bfa58a1" processor="http:listener">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="/api/*" attributeName="path" />
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-httpListenerConfig" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_ACCEPTABLE" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="8c15d5c6-65d5-4ec9-a1f2-ef5e94b455cf" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_ACCEPTABLE" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<try doc:name="Try" doc:id="d2a1a9a3-6b4c-46e9-8650-f2d388ff38ad" >
+				<flow-ref doc:name="Flow-ref to lm-aws-sapi-main" doc:id="4311e8e5-59da-435f-8ce4-cf56625414bd" name="lm-aws-sapi-main" />
+				<error-handler>
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="574ac37e-37a4-45bc-9689-27708d29bfce" type="APIKIT:NOT_ACCEPTABLE"/>
+				</error-handler>
+			</try>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="lm-aws-sapi-suiteTesr-415" doc:id="7126a53e-34df-4a92-8771-f474b2078966" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="86e4a535-636f-490e-ba9f-6c9dd6f5af3a" processor="http:listener">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="/api/*" attributeName="path" />
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-httpListenerConfig" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:UNSUPPORTED_MEDIA_TYPE" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="8e66bada-33fa-42e3-995b-596b78021b51" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:UNSUPPORTED_MEDIA_TYPE" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<try doc:name="Try" doc:id="8a2708a7-1a47-4b69-9027-6e841af2c1eb" >
+				<flow-ref doc:name="Flow-ref to lm-aws-sapi-main" doc:id="f7e5067e-3ff2-448a-a27a-57b457731ea7" name="lm-aws-sapi-main" />
+				<error-handler>
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="475875b2-b153-4182-b5c7-85a5bd20053f" type="APIKIT:UNSUPPORTED_MEDIA_TYPE"/>
+				</error-handler>
+			</try>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="lm-aws-sapi-suiteTesr-501" doc:id="dd3c8f0e-1da1-49fb-bd25-8ee02b687624" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="0f79f7c4-0e36-4c52-a269-805c463c4f13" processor="http:listener">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="/api/*" attributeName="path" />
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-httpListenerConfig" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_IMPLEMENTED" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="f11ffe2f-f063-4903-a123-7cc0124e073a" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_IMPLEMENTED" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<try doc:name="Try" doc:id="30f4b093-7352-4039-b769-1fae65a8d228" >
+				<flow-ref doc:name="Flow-ref to lm-aws-sapi-main" doc:id="9f578ab3-02d1-4b33-8f71-335c56986023" name="lm-aws-sapi-main" />
+				<error-handler>
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="f9c462f2-1485-4791-bd48-923e6be0f4de" type="APIKIT:NOT_IMPLEMENTED"/>
+				</error-handler>
+			</try>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="lm-aws-sapi-suiteTesr-common-error" doc:id="5590d005-4238-47f2-9add-17242530d4f6" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="c0cbbf8b-b08b-49a4-87ac-cfaa9ce299f7" processor="http:listener">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="/api/*" attributeName="path" />
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-httpListenerConfig" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="ANY" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="8df999ca-835b-42d5-aea5-8bb0275be20f" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="lm-aws-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="ANY" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<try doc:name="Try" doc:id="13b88021-d70d-40f5-9e1e-b89a51a63d39" >
+				<flow-ref doc:name="Flow-ref to lm-aws-sapi-main" doc:id="1eccbba7-ab75-409d-a2d5-8e41c12b0421" name="lm-aws-sapi-main" />
+				<error-handler>
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="094839b0-a3b2-4cfa-bbcb-890544660daf" type="ANY"/>
+				</error-handler>
+			</try>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="post:\product:application\json:lm-aws-sapi-config-test" doc:id="3e92e71e-f2e5-4fe3-b4a5-c0ee927a6a19" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="72a03220-2706-47f0-87b4-1103a64138bc" >
+				<munit:payload value="#[output application/json  --- readUrl('classpath://postproductapplicationjsonlmawssapiconfigtest1\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json " />
+				<munit:attributes value="#[readUrl('classpath://postproductapplicationjsonlmawssapiconfigtest1\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://postproductapplicationjsonlmawssapiconfigtest1\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to post:\product:application\json:lm-aws-sapi-config" doc:id="0077c72b-da5a-4ee2-82e1-e3691b8c427e" name="post:\product:application\json:lm-aws-sapi-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="5b57baea-c861-47f3-9627-8c1ac8cd7fbf" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import postproductapplicationjsonlmawssapiconfigtest1::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="get:\products\(id):lm-aws-sapi-config-test" doc:id="598affed-fedb-4cb6-9b34-4d30523c0bc4" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="862f8762-318e-4bd9-b454-155ee17d6947" >
+				<munit:payload value="#[readUrl('classpath://getproductsidlmawssapiconfigtest1\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://getproductsidlmawssapiconfigtest1\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://getproductsidlmawssapiconfigtest1\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get:\products\(id):lm-aws-sapi-config" doc:id="a9e0377d-be6e-410c-9363-e1c599589074" name="get:\products\(id):lm-aws-sapi-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="f69bbf85-c802-46c5-b42a-7d7fc9470cfe" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import getproductsidlmawssapiconfigtest1::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+</mule>

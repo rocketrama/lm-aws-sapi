@@ -1,0 +1,14 @@
+%dw 2.0
+
+type auto_0f95d6f9_bebf_4ff4_9cac_f95d13948b1a_Output_Payload = {|
+  productModel?: String, 
+  productImage?: String, 
+  productId?: Number, 
+  productMake?: String, 
+  productName?: String, 
+  productPrice?: Number, 
+  productDescription?: String, 
+  productFeature?: String
+|} {"description": "This is a product's datatype",
+"label": "Product Datatype"}
+
